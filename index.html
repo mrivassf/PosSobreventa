@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobreventas POS - Mockup Mejorado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 1200px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1000;
+        }
+
+        /* Header */
+        .modal-header {
+            padding: 24px 32px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .header-text h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .badge-count {
+            background: #667eea;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        .btn-close {
+            background: #f5f5f5;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .btn-close:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        /* Body Container */
+        .modal-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Section - Actions Panel */
+        .actions-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e0e0e0;
+            background: #fdfdfd;
+            /* Fondo ligeramente diferente para distinguir acciones */
+        }
+
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            /* Ocupa el espacio disponible por ahora, ya que es la única acción */
+            min-height: 0;
+            /* Importante para scroll anidado */
+        }
+
+        .section-header {
+            padding: 20px 24px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+            transition: transform 0.3s;
+        }
+
+        .btn-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .sobreventas-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        /* Sobreventa Card */
+        .sobreventa-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .sobreventa-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .sobreventa-card.selected {
+            border: 2px solid #5a67d8;
+            /* Borde más fuerte */
+            background: #eff6ff;
+            box-shadow: 0 0 0 1px #5a67d8, 0 8px 25px rgba(90, 103, 216, 0.25);
+        }
+
+        .selection-indicator {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            background: #5a67d8;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(90, 103, 216, 0.3);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .sobreventa-card.selected .selection-indicator {
+            display: flex;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-remove-item {
+            display: none;
+            background: #fff;
+            border: 1px solid #e53e3e;
+            color: #e53e3e;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-remove-item:hover {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .sobreventa-card.selected .btn-remove-item {
+            display: block;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-title-section {
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .promo-badge {
+            background: #ffeaa7;
+            color: #d63031;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .card-body {
+            padding: 0;
+        }
+
+        .item-table {
+            width: 100%;
+        }
+
+        .item-table thead {
+            background: #f8f9fa;
+        }
+
+        .item-table th {
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .item-table th:last-child {
+            text-align: right;
+        }
+
+        .item-table td {
+            padding: 16px 20px;
+            font-size: 14px;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .item-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .item-name {
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .item-selector {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .item-selector:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .price-cell {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .price-original {
+            color: #999;
+            font-size: 13px;
+            margin-right: 8px;
+        }
+
+        .price-discount {
+            color: #00b894;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .discount-badge {
+            background: #00b894;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* Right Section - Summary */
+        .summary-section {
+            width: 320px;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-content {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .summary-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 8px;
+        }
+
+        .summary-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-row.total {
+            padding-top: 16px;
+            border-top: 2px solid #e0e0e0;
+            margin-top: 8px;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .summary-label.total {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .summary-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .summary-value.discount {
+            color: #00b894;
+        }
+
+        .summary-value.total {
+            font-size: 20px;
+            color: #1a1a1a;
+        }
+
+        /* Footer */
+        .modal-footer {
+            padding: 20px 32px;
+            border-top: 2px solid #e0e0e0;
+            background: #fafafa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-info {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #666;
+            border: 2px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 15px;
+        }
+
+        /* Scrollbar */
+        .sobreventas-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sobreventas-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .sobreventas-list::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        .sobreventas-list::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        /* Info Icon */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: help;
+            margin-left: 6px;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="modal-overlay"></div>
+
+    <div class="modal">
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="header-content">
+                <div class="header-icon">🎁</div>
+                <div class="header-text">
+                    <h2>
+                        Acciones
+                    </h2>
+                    <p class="header-subtitle">Selecciona las acciones a realizar sobre su pedido</p>
+                </div>
+            </div>
+            <button class="btn-close">×</button>
+        </div>
+
+        <!-- Body -->
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Left Section - Actions Panel -->
+            <div class="actions-panel">
+
+                <!-- Action Group: Sobreventas -->
+                <div class="action-group">
+                    <div class="section-header">
+                        <div class="section-title">
+                            📋 Sobreventas
+                            <span class="badge-count"
+                                style="font-size: 12px; padding: 4px 10px; margin-left: 8px;">3</span>
+                        </div>
+                        <button class="btn-toggle" onclick="toggleList()" title="Contraer/Expandir">▼</button>
+                    </div>
+
+                    <div class="sobreventas-list" id="sobreventas-list">
+                        <!-- Sobreventa 1 -->
+                        <div class="sobreventa-card">
+                            <div class="card-header">
+                                <div class="card-title-section">
+                                    <div class="card-title">
+                                        Sobreventa Test
+                                    </div>
+                                    <div class="card-description">
+                                        Llevando un tentación te llevas un palito con 50% de descuento
+                                    </div>
+                                </div>
+                                <div class="header-actions">
+                                    <div class="selection-indicator">
+                                        🛒 Agregado
+                                    </div>
+                                    <button class="btn-remove-item" title="Quitar ítem">Quitar</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <table class="item-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 45%;">Ítem</th>
+                                            <th style="width: 20%;">Importe</th>
+                                            <th style="width: 20%;">Descuento</th>
+                                            <th style="width: 15%;">% Desc.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select class="item-selector">
+                                                    <option value="">Seleccionar ítem...</option>
+                                                    <option value="palito">Palito de Bombón</option>
+                                                    <option value="tentacion">Palito Pico Dulce</option>
+                                                    <option value="helado">Palito Frutal Frutilla</option>
+                                                </select>
+                                            </td>
+                                            <td class="price-cell">
+                                                <span class="price-original">$300.00</span>
+                                            </td>
+                                            <td class="price-cell">
+                                                <span class="price-discount">$0.00</span>
+                                            </td>
+                                            <td class="price-cell">
+                                                <span class="discount-badge">0.00%</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sobreventa 2 -->
+                        <div class="sobreventa-card">
+                            <div class="card-header">
+                                <div class="card-title-section">
+                                    <div class="card-title">
+                                        Sob-1 Llevando pizza un 1 kilo 5000 pesos
+                                    </div>
+                                    <div class="card-description">
+                                        Llevando una pizza muzza tenes un 1 kilo por 5000 pesos
+                                    </div>
+                                </div>
+                                <div class="header-actions">
+                                    <div class="selection-indicator">
+                                        🛒 Agregado
+                                    </div>
+                                    <button class="btn-remove-item" title="Quitar ítem">Quitar</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <table class="item-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 45%;">Ítem</th>
+                                            <th style="width: 20%;">Importe</th>
+                                            <th style="width: 20%;">Descuento</th>
+                                            <th style="width: 15%;">% Desc.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select class="item-selector">
+                                                    <option value="">Seleccionar ítem...</option>
+                                                    <option value="choco">1 Kilo</option>
+                                                </select>
+                                            </td>
+                                            <td class="price-cell">
+                                                <span class="price-original">$0.00</span>
+                                            </td>
+                                            <td class="price-cell">
+                                                <span class="price-discount">$0.00</span>
+                                            </td>
+                                            <td class="price-cell">
+                                                <span class="discount-badge">0.00%</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sobreventa 3 -->
+                        <div class="sobreventa-card">
+                            <div class="card-header">
+                                <div class="card-title-section">
+                                    <div class="card-title">
+                                        Sob-2 Compra mayor a 10000 pesos
+                                    </div>
+                                    <div class="card-description">
+                                        Con tu compra mayor a 10000 pesos llevate 1/2 kilo de helado 8000 pesos vs
+                                        precio normal
+                                        15000
+                                    </div>
+                                </div>
+                                <div class="header-actions">
+                                    <div class="selection-indicator">
+                                        🛒 Agregado
+                                    </div>
+                                    <button class="btn-remove-item" title="Quitar ítem">Quitar</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <table class="item-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 45%;">Ítem</th>
+                                            <th style="width: 20%;">Importe</th>
+                                            <th style="width: 20%;">Descuento</th>
+                                            <th style="width: 15%;">% Desc.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select class="item-selector">
+                                                    <option value="">Seleccionar ítem...</option>
+                                                    <option value="combo1">1/2 Kilo</option>
+                                                </select>
+                                            </td>
+                                            <td class="price-cell">
+                                                <span class="price-original">$0.00</span>
+                                            </td>
+                                            <td class="price-cell">
+                                                <span class="price-discount">$0.00</span>
+                                            </td>
+                                            <td class="price-cell">
+                                                <span class="discount-badge">0.00%</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Section - Importes Panel -->
+            <div class="summary-section">
+                <div class="summary-content">
+                    <div class="summary-title">
+                        💰 Importes
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-row">
+                            <span class="summary-label">Subtotal</span>
+                            <span class="summary-value">$14,800.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">
+                                Sobreventas
+                            </span>
+                            <span class="summary-value discount">-$600.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span class="summary-label total">Total</span>
+                            <span class="summary-value total">$14,200.00</span>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top: auto; padding: 16px; background: #e8f4fd; border-radius: 8px; border: 1px solid #bee5eb;">
+                        <div style="font-size: 13px; color: #004085; line-height: 1.5;">
+                            <strong>💡 Tip:</strong> Selecciona un ítem de la lista para activar la oferta y agregarla
+                            al pedido.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <div class="footer-info">
+                <strong>2 ofertas seleccionadas</strong> de 3 disponibles
+            </div>
+            <div class="footer-actions">
+                <button class="btn btn-secondary">Cancelar</button>
+                <button class="btn btn-primary">Confirmar Pedido</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleList() {
+            const list = document.getElementById('sobreventas-list');
+            const button = event.target;
+
+            if (list.style.display === 'none') {
+                list.style.display = 'block';
+                button.classList.remove('collapsed');
+            } else {
+                list.style.display = 'none';
+                button.classList.add('collapsed');
+            }
+        }
+
+        function updateSummary() {
+            const activeCards = document.querySelectorAll('.sobreventa-card.selected');
+            const activeCount = activeCards.length;
+            document.querySelector('.footer-info strong').textContent = activeCount + ' acciones seleccionadas';
+
+            let totalSobreventas = 0;
+            const subtotal = 14800; // Valor base fijo según mockup
+
+            activeCards.forEach(card => {
+                // Buscar el precio original (Importe) dentro de la tarjeta
+                const priceElement = card.querySelector('.price-original');
+                if (priceElement) {
+                    // Limpiar el string para obtener el número (quitar $, comas, paréntesis, etc.)
+                    const priceText = priceElement.textContent.replace(/[^0-9.-]+/g, "");
+                    const price = parseFloat(priceText);
+                    if (!isNaN(price)) {
+                        totalSobreventas += price;
+                    }
+                }
+            });
+
+            // Actualizar etiquetas en el resumen
+            const sobreventasElement = document.querySelector('.summary-value.discount');
+            if (sobreventasElement) {
+                // Mostrar como positivo ya que es suma de importes
+                sobreventasElement.textContent = '$' + totalSobreventas.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                // Quitar clase discount si ya no es un descuento, o mantener el color segun preferencia. 
+                // El usuario quiere suma de montos, así que ya no es negativo.
+                sobreventasElement.style.color = '#333';
+            }
+
+            const totalElement = document.querySelector('.summary-value.total');
+            if (totalElement) {
+                const total = subtotal + totalSobreventas;
+                totalElement.textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+        }
+
+        // Item selector change
+        document.querySelectorAll('.item-selector').forEach(select => {
+            select.addEventListener('change', function () {
+                const row = this.closest('tr');
+                const card = this.closest('.sobreventa-card');
+                const cardIndex = Array.from(document.querySelectorAll('.sobreventa-card')).indexOf(card);
+
+                if (this.value) {
+                    // Simular cálculo de precios y descuentos según la tarjeta
+                    let originalPrice, discountPrice, discountPercent, discountAmount;
+
+                    if (cardIndex === 0) { // Sobreventa Test
+                        originalPrice = 300.00;
+                        discountAmount = 250.00; // Valor final con descuento
+                    } else if (cardIndex === 1) { // Sob-1
+                        originalPrice = 5000.00;
+                        discountAmount = 600.00;
+                    } else if (cardIndex === 2) { // Sob-2
+                        originalPrice = 8000.00;
+                        discountAmount = 7000.00;
+                    }
+
+                    // Calcular porcentaje y mostrar valores
+                    discountPercent = ((originalPrice - discountAmount) / originalPrice) * 100; // Esto es el descuento real si discountAmount fuera el precio final? 
+                    // Revisando mockup anterior: 
+                    // Card 1: $300 -> $250?? No, mockup decia $500 -> $0 discount? Espera.
+                    // El usuario cambio Card 1 a $300.00 original.
+                    // Vamos a simplificar con valores fijos coherentes con lo que venía.
+
+                    if (cardIndex === 0) {
+                        row.querySelector('.price-original').textContent = '$250.00';
+                        row.querySelector('.price-discount').textContent = '$250.00';
+                        row.querySelector('.discount-badge').textContent = '-50%';
+                        row.querySelector('.discount-badge').style.background = '#00b894';
+                    } else if (cardIndex === 1) {
+                        row.querySelector('.price-original').textContent = '$5,000.00';
+                        row.querySelector('.price-discount').textContent = '$3,000.00';
+                        row.querySelector('.discount-badge').textContent = '-62.0%';
+                        row.querySelector('.discount-badge').style.background = '#00b894';
+                    } else if (cardIndex === 2) {
+                        row.querySelector('.price-original').textContent = '$8,000.00';
+                        row.querySelector('.price-discount').textContent = '$7,000.00';
+                        row.querySelector('.discount-badge').textContent = '-53.33%';
+                        row.querySelector('.discount-badge').style.background = '#00b894';
+                    }
+
+                    // Activar tarjeta al seleccionar ítem
+                    card.classList.add('selected');
+                    updateSummary();
+
+                } else {
+                    // Resetear y desactivar si se elige "Seleccionar..."
+                    row.querySelector('.price-original').textContent = '$0.00';
+                    row.querySelector('.price-discount').textContent = '$0.00';
+                    row.querySelector('.discount-badge').textContent = '0.00%';
+                    row.querySelector('.discount-badge').style.background = '#ddd';
+
+                    card.classList.remove('selected');
+                    updateSummary();
+                }
+            });
+        });
+
+        // Remove item buttons
+        document.querySelectorAll('.btn-remove-item').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation(); // Prevenir clicks en tarjeta
+                const card = this.closest('.sobreventa-card');
+                const select = card.querySelector('.item-selector');
+                if (select) {
+                    select.value = "";
+                    // Disparar evento change manualmente para actualizar vista y resumen
+                    select.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+
+        // Inicializar resumen al cargar
+        updateSummary();
+    </script>
+</body>
+
+</html>
