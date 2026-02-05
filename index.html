@@ -205,14 +205,18 @@
         .selection-indicator {
             display: none;
             align-items: center;
+            justify-content: center;
             gap: 6px;
-            background: #5a67d8;
+            background: #00b894;
+            /* Verde */
             color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
+            padding: 6px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 16px;
             font-weight: 600;
-            box-shadow: 0 4px 6px rgba(90, 103, 216, 0.3);
+            box-shadow: 0 4px 6px rgba(0, 184, 148, 0.3);
             animation: fadeIn 0.3s ease;
         }
 
@@ -241,23 +245,30 @@
         .btn-remove-item {
             display: none;
             background: #fff;
-            border: 1px solid #e53e3e;
-            color: #e53e3e;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
+            border: 2px solid #ff7675;
+            color: #ff7675;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
 
         .btn-remove-item:hover {
-            background: #e53e3e;
+            background: #ff7675;
             color: white;
+            border-color: #ff7675;
+            transform: rotate(90deg);
         }
 
         .sobreventa-card.selected .btn-remove-item {
-            display: block;
+            display: flex;
         }
 
         .card-header {
@@ -637,9 +648,9 @@
                                 </div>
                                 <div class="header-actions">
                                     <div class="selection-indicator">
-                                        🛒 Agregado
+                                        ✔
                                     </div>
-                                    <button class="btn-remove-item" title="Quitar ítem">Quitar</button>
+                                    <button class="btn-remove-item" title="Quitar ítem">×</button>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -690,9 +701,9 @@
                                 </div>
                                 <div class="header-actions">
                                     <div class="selection-indicator">
-                                        🛒 Agregado
+                                        ✔
                                     </div>
-                                    <button class="btn-remove-item" title="Quitar ítem">Quitar</button>
+                                    <button class="btn-remove-item" title="Quitar ítem">×</button>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -743,9 +754,9 @@
                                 </div>
                                 <div class="header-actions">
                                     <div class="selection-indicator">
-                                        🛒 Agregado
+                                        ✔
                                     </div>
-                                    <button class="btn-remove-item" title="Quitar ítem">Quitar</button>
+                                    <button class="btn-remove-item" title="Quitar ítem">×</button>
                                 </div>
                             </div>
                             <div class="card-body">
